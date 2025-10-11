@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/lucas-tremaroli/clist/cmd/task"
 	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
 	Use:   "clist",
 	Short: "clist is a simple CLI tool",
-	Long:  `clist is a simple CLI tool to demonstrate Cobra library usage.`,
+	Long:  `clist is a simple CLI tool to manage tasks and notes`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 	},
@@ -22,4 +23,8 @@ func Execute() error {
 		os.Exit(1)
 	}
 	return nil
+}
+
+func init() {
+	rootCmd.AddCommand(task.AddCmd)
 }
