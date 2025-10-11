@@ -26,5 +26,5 @@ func Execute() error {
 }
 
 func init() {
-	rootCmd.AddCommand(task.AddCmd)
+	rootCmd.AddCommand(task.TaskCmd)
 }
