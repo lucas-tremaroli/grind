@@ -12,7 +12,7 @@ var rootCmd = &cobra.Command{
 	Short: "clist is a simple CLI tool",
 	Long:  `clist is a simple CLI tool to demonstrate Cobra library usage.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Hello, World!")
+		cmd.Help()
 	},
 }
 
@@ -22,10 +22,4 @@ func Execute() error {
 		os.Exit(1)
 	}
 	return nil
-}
-
-func init() {
-	// Global flags that apply to all commands
-	rootCmd.PersistentFlags().StringP("config", "c", "", "config file path")
-	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
 }
