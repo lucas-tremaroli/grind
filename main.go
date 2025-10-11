@@ -1,11 +1,7 @@
 package main
 
-import "fmt"
-
-func helloWorld() string {
-	return "Hello, World!"
-}
+import "github.com/lucas-tremaroli/clist/cmd"
 
 func main() {
-	fmt.Println(helloWorld())
+	cmd.Execute()
 }
