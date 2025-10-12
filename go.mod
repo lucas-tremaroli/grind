@@ -1,4 +1,4 @@
-module github.com/lucas-tremaroli/clist
+module github.com/lucas-tremaroli/grind
 
 go 1.25.1
 

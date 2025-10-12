@@ -8,7 +8,7 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/lucas-tremaroli/clist/internal/storage"
+	"github.com/lucas-tremaroli/grind/internal/storage"
 )
 
 type Board struct {

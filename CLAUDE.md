@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**clist** is a CLI tool for to-do lists and notes, written in Go.
+**grind** is a CLI tool for to-do lists and notes, written in Go.
 
 ## Development Setup
 
@@ -12,7 +12,7 @@ This is a Go project. The standard Go development workflow applies:
 
 ```bash
 # Initialize Go module (if not already done)
-go mod init github.com/your-username/clist
+go mod init github.com/your-username/grind
 
 # Build the project
 go build

@@ -51,12 +51,12 @@ func getDBPath() (string, error) {
 		return "", err
 	}
 
-	clistDir := filepath.Join(configDir, "clist")
-	if err := os.MkdirAll(clistDir, 0755); err != nil {
+	grindDir := filepath.Join(configDir, "grind")
+	if err := os.MkdirAll(grindDir, 0755); err != nil {
 		return "", err
 	}
 
-	return filepath.Join(clistDir, "tasks.db"), nil
+	return filepath.Join(grindDir, "tasks.db"), nil
 }
 
 func (db *DB) createTables() error {
