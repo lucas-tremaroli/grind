@@ -30,6 +30,8 @@ func NewForm(title, description string) *Form {
 	}
 	form.title.Placeholder = title
 	form.description.Placeholder = description
+	form.title.SetValue(title)
+	form.description.SetValue(description)
 	form.title.Focus()
 	return &form
 }
