@@ -1,6 +1,6 @@
 # grind
 
-A CLI tool for to-do lists and notes.
+A CLI tool for managing tasks and notes.
 
 ## Installation
 
