@@ -18,28 +18,24 @@ type Form struct {
 	board       *Board
 }
 
-func newDefaultForm() *Form {
-	return NewForm("task name", "")
-}
-
-func NewForm(title, description string) *Form {
+func NewForm(title, description string, board *Board) *Form {
 	form := Form{
 		help:        help.New(),
 		title:       textinput.New(),
 		description: textarea.New(),
+		board:       board,
 	}
+
+	if title == "" {
+		title = "task name"
+	}
+
 	form.title.Placeholder = title
 	form.description.Placeholder = description
 	form.title.SetValue(title)
 	form.description.SetValue(description)
 	form.title.Focus()
 	return &form
-}
-
-func NewFormWithBoard(title, description string, board *Board) *Form {
-	form := NewForm(title, description)
-	form.board = board
-	return form
 }
 
 func (f Form) CreateTask() Task {

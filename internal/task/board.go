@@ -8,7 +8,6 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/lucas-tremaroli/grind/internal/storage"
 )
 
 type Board struct {
@@ -17,20 +16,20 @@ type Board struct {
 	focused  status
 	cols     []column
 	quitting bool
-	db       *storage.DB
+	service  *Service
 }
 
 func NewBoard() *Board {
 	help := help.New()
 	help.ShowAll = true
 
-	db, err := storage.NewDB()
+	service, err := NewService()
 	if err != nil {
-		log.Printf("Failed to initialize database: %v", err)
+		log.Printf("Failed to initialize service: %v", err)
 		return nil
 	}
 
-	board := &Board{help: help, focused: todo, db: db}
+	board := &Board{help: help, focused: todo, service: service}
 	board.initLists()
 	return board
 }
@@ -44,7 +43,7 @@ func (m *Board) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		var cmd tea.Cmd
 		var cmds []tea.Cmd
-		m.help.Width = msg.Width - margin
+		m.help.Width = msg.Width - Margin
 		for i := 0; i < len(m.cols); i++ {
 			var res tea.Model
 			res, cmd = m.cols[i].Update(msg)
@@ -55,36 +54,36 @@ func (m *Board) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Batch(cmds...)
 	case Form:
 		task := msg.CreateTask()
-		if msg.index == APPEND {
+		if msg.index == AppendIndex {
 			// Creating new task
-			if _, err := m.db.CreateTask(task.Title(), task.Description(), int(task.Status())); err != nil {
-				log.Printf("Failed to save task to database: %v", err)
+			if err := m.service.CreateTask(task); err != nil {
+				log.Printf("Failed to save task: %v", err)
 			}
 		} else {
 			// Editing existing task - get the original task ID
 			originalTask := m.cols[m.focused].list.Items()[msg.index].(Task)
 			task = NewTaskWithID(originalTask.ID(), task.Status(), task.Title(), task.Description())
-			if err := m.db.UpdateTask(task.ID(), task.Title(), task.Description(), int(task.Status())); err != nil {
-				log.Printf("Failed to update task in database: %v", err)
+			if err := m.service.UpdateTask(task); err != nil {
+				log.Printf("Failed to update task: %v", err)
 			}
 		}
 		return m, m.cols[m.focused].Set(msg.index, task)
 	case moveMsg:
-		if err := m.db.UpdateTask(msg.Task.ID(), msg.Task.Title(), msg.Task.Description(), int(msg.Task.Status())); err != nil {
-			log.Printf("Failed to update task in database: %v", err)
+		if err := m.service.UpdateTask(msg.Task); err != nil {
+			log.Printf("Failed to update task: %v", err)
 		}
-		return m, m.cols[m.focused.getNext()].Set(APPEND, msg.Task)
+		return m, m.cols[m.focused.getNext()].Set(AppendIndex, msg.Task)
 	case deleteMsg:
-		if err := m.db.DeleteTask(msg.Task.ID()); err != nil {
-			log.Printf("Failed to delete task from database: %v", err)
+		if err := m.service.DeleteTask(msg.Task.ID()); err != nil {
+			log.Printf("Failed to delete task: %v", err)
 		}
 		return m, nil
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, keys.Quit):
 			m.quitting = true
-			if m.db != nil {
-				m.db.Close()
+			if m.service != nil {
+				m.service.Close()
 			}
 			return m, tea.Quit
 		case key.Matches(msg, keys.Left):
@@ -136,23 +135,22 @@ func (b *Board) initLists() {
 }
 
 func (b *Board) loadTasksFromDB() {
-	if b.db == nil {
+	if b.service == nil {
 		b.loadDefaultTasks()
 		return
 	}
 
-	taskRecords, err := b.db.GetAllTasks()
+	tasks, err := b.service.LoadAllTasks()
 	if err != nil {
-		log.Printf("Failed to load tasks from database: %v", err)
+		log.Printf("Failed to load tasks: %v", err)
 		b.loadDefaultTasks()
 		return
 	}
 
 	var todoItems, inProgressItems, doneItems []list.Item
 
-	for _, record := range taskRecords {
-		task := NewTaskWithID(record.ID, status(record.Status), record.Title, record.Description)
-		switch status(record.Status) {
+	for _, task := range tasks {
+		switch task.Status() {
 		case todo:
 			todoItems = append(todoItems, task)
 		case inProgress:

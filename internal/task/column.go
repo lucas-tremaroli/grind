@@ -42,55 +42,32 @@ func (c column) Init() tea.Cmd {
 }
 
 func (c column) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	var cmd tea.Cmd
-	switch msg := msg.(type) {
-	case tea.WindowSizeMsg:
-		c.setSize(msg.Width, msg.Height)
-		c.list.SetSize(msg.Width/margin, msg.Height/2)
-	case tea.KeyMsg:
-		switch {
-		case key.Matches(msg, keys.Edit):
-			if len(c.list.VisibleItems()) != 0 {
-				task := c.list.SelectedItem().(Task)
-				f := NewForm(task.title, task.description)
-				f.index = c.list.Index()
-				f.col = c
-				return f.Update(nil)
-			}
-		case key.Matches(msg, keys.New):
-			f := newDefaultForm()
-			f.index = APPEND
-			f.col = c
-			return f.Update(nil)
-		case key.Matches(msg, keys.Delete):
-			return c, c.DeleteCurrent()
-		case key.Matches(msg, keys.Enter):
-			return c, c.MoveToNext()
-		}
-	}
-	c.list, cmd = c.list.Update(msg)
-	return c, cmd
+	return c.update(msg, nil)
 }
 
 func (c column) UpdateWithBoard(msg tea.Msg, board *Board) (tea.Model, tea.Cmd) {
+	return c.update(msg, board)
+}
+
+func (c column) update(msg tea.Msg, board *Board) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		c.setSize(msg.Width, msg.Height)
-		c.list.SetSize(msg.Width/margin, msg.Height/2)
+		c.setSize(msg.Width)
+		c.list.SetSize(msg.Width/Margin, msg.Height/2)
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, keys.Edit):
 			if len(c.list.VisibleItems()) != 0 {
 				task := c.list.SelectedItem().(Task)
-				f := NewFormWithBoard(task.title, task.description, board)
+				f := NewForm(task.title, task.description, board)
 				f.index = c.list.Index()
 				f.col = c
 				return f.Update(nil)
 			}
 		case key.Matches(msg, keys.New):
-			f := NewFormWithBoard("task name", "", board)
-			f.index = APPEND
+			f := NewForm("", "", board)
+			f.index = AppendIndex
 			f.col = c
 			return f.Update(nil)
 		case key.Matches(msg, keys.Delete):
@@ -113,7 +90,7 @@ func (c *column) DeleteCurrent() tea.Cmd {
 	if task, ok = c.list.SelectedItem().(Task); !ok {
 		return nil
 	}
-	
+
 	if len(c.list.VisibleItems()) > 0 {
 		c.list.RemoveItem(c.list.Index())
 	}
@@ -124,14 +101,14 @@ func (c *column) DeleteCurrent() tea.Cmd {
 }
 
 func (c *column) Set(i int, t Task) tea.Cmd {
-	if i != APPEND {
+	if i != AppendIndex {
 		return c.list.SetItem(i, t)
 	}
-	return c.list.InsertItem(APPEND, t)
+	return c.list.InsertItem(AppendIndex, t)
 }
 
-func (c *column) setSize(width, height int) {
-	c.width = width / margin
+func (c *column) setSize(width int) {
+	c.width = width / Margin
 }
 
 func (c *column) getStyle() lipgloss.Style {

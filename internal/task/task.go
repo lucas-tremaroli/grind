@@ -3,10 +3,10 @@ package task
 import "github.com/google/uuid"
 
 type Task struct {
-	id          string `json:"id"`
-	status      status `json:"status"`
-	title       string `json:"title"`
-	description string `json:"description"`
+	id          string
+	status      status
+	title       string
+	description string
 }
 
 func NewTask(status status, title, description string) Task {
@@ -53,6 +53,26 @@ func (t Task) ID() string {
 
 func (t Task) Status() status {
 	return t.status
+}
+
+// SetStatus updates the task status with validation
+func (t *Task) SetStatus(s status) error {
+	if s < todo || s > done {
+		return ErrInvalidStatus
+	}
+	t.status = s
+	return nil
+}
+
+// Validate checks if the task has valid data
+func (t Task) Validate() error {
+	if t.title == "" {
+		return ErrEmptyTitle
+	}
+	if t.status < todo || t.status > done {
+		return ErrInvalidStatus
+	}
+	return nil
 }
 
 type status int
