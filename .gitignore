@@ -28,6 +28,10 @@ go.work.sum
 # env file
 .env
 
+# Claude files
+.claude/
+CLAUDE.md
+
 # Editor/IDE
 # .idea/
 # .vscode/
