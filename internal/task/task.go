@@ -1,13 +1,30 @@
 package task
 
+import "github.com/google/uuid"
+
 type Task struct {
-	status      status
-	title       string
-	description string
+	id          string `json:"id"`
+	status      status `json:"status"`
+	title       string `json:"title"`
+	description string `json:"description"`
 }
 
 func NewTask(status status, title, description string) Task {
-	return Task{status: status, title: title, description: description}
+	return Task{
+		id:          uuid.New().String(),
+		status:      status,
+		title:       title,
+		description: description,
+	}
+}
+
+func NewTaskWithID(id string, status status, title, description string) Task {
+	return Task{
+		id:          id,
+		status:      status,
+		title:       title,
+		description: description,
+	}
 }
 
 func (t *Task) Next() {
@@ -28,6 +45,14 @@ func (t Task) Title() string {
 
 func (t Task) Description() string {
 	return t.description
+}
+
+func (t Task) ID() string {
+	return t.id
+}
+
+func (t Task) Status() status {
+	return t.status
 }
 
 type status int

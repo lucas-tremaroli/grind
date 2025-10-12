@@ -43,7 +43,7 @@ func NewFormWithBoard(title, description string, board *Board) *Form {
 }
 
 func (f Form) CreateTask() Task {
-	return Task{f.col.status, f.title.Value(), f.description.Value()}
+	return NewTask(f.col.status, f.title.Value(), f.description.Value())
 }
 
 func (f Form) Init() tea.Cmd {
