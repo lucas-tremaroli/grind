@@ -55,8 +55,18 @@ func (m *Board) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Batch(cmds...)
 	case Form:
 		task := msg.CreateTask()
-		if _, err := m.db.CreateTask(task.Title(), task.Description(), int(task.Status())); err != nil {
-			log.Printf("Failed to save task to database: %v", err)
+		if msg.index == APPEND {
+			// Creating new task
+			if _, err := m.db.CreateTask(task.Title(), task.Description(), int(task.Status())); err != nil {
+				log.Printf("Failed to save task to database: %v", err)
+			}
+		} else {
+			// Editing existing task - get the original task ID
+			originalTask := m.cols[m.focused].list.Items()[msg.index].(Task)
+			task = NewTaskWithID(originalTask.ID(), task.Status(), task.Title(), task.Description())
+			if err := m.db.UpdateTask(task.ID(), task.Title(), task.Description(), int(task.Status())); err != nil {
+				log.Printf("Failed to update task in database: %v", err)
+			}
 		}
 		return m, m.cols[m.focused].Set(msg.index, task)
 	case moveMsg:
@@ -64,6 +74,11 @@ func (m *Board) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			log.Printf("Failed to update task in database: %v", err)
 		}
 		return m, m.cols[m.focused.getNext()].Set(APPEND, msg.Task)
+	case deleteMsg:
+		if err := m.db.DeleteTask(msg.Task.ID()); err != nil {
+			log.Printf("Failed to delete task from database: %v", err)
+		}
+		return m, nil
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, keys.Quit):

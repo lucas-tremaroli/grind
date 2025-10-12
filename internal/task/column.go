@@ -108,13 +108,19 @@ func (c column) View() string {
 }
 
 func (c *column) DeleteCurrent() tea.Cmd {
+	var task Task
+	var ok bool
+	if task, ok = c.list.SelectedItem().(Task); !ok {
+		return nil
+	}
+	
 	if len(c.list.VisibleItems()) > 0 {
 		c.list.RemoveItem(c.list.Index())
 	}
 
 	var cmd tea.Cmd
 	c.list, cmd = c.list.Update(nil)
-	return cmd
+	return tea.Sequence(cmd, func() tea.Msg { return deleteMsg{task} })
 }
 
 func (c *column) Set(i int, t Task) tea.Cmd {
@@ -145,6 +151,10 @@ func (c *column) getStyle() lipgloss.Style {
 }
 
 type moveMsg struct {
+	Task
+}
+
+type deleteMsg struct {
 	Task
 }
 
