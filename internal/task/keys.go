@@ -45,23 +45,23 @@ var keys = keyMap{
 	),
 	Up: key.NewBinding(
 		key.WithKeys("up", "k"),
-		key.WithHelp("↑/k", "move up"),
+		key.WithHelp("↑/k", "navigate up"),
 	),
 	Down: key.NewBinding(
 		key.WithKeys("down", "j"),
-		key.WithHelp("↓/j", "move down"),
+		key.WithHelp("↓/j", "navigate down"),
 	),
 	Right: key.NewBinding(
 		key.WithKeys("right", "l"),
-		key.WithHelp("→/l", "move right"),
+		key.WithHelp("→/l", "navigate right"),
 	),
 	Left: key.NewBinding(
 		key.WithKeys("left", "h"),
-		key.WithHelp("←/h", "move left"),
+		key.WithHelp("←/h", "navigate left"),
 	),
 	Enter: key.NewBinding(
 		key.WithKeys("enter"),
-		key.WithHelp("enter", "enter"),
+		key.WithHelp("enter", "move task"),
 	),
 	Help: key.NewBinding(
 		key.WithKeys("?"),
