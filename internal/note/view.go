@@ -2,14 +2,6 @@ package note
 
 import (
 	"strings"
-
-	"github.com/charmbracelet/lipgloss"
-)
-
-var (
-	statusMessageStyle = lipgloss.NewStyle().
-		Foreground(lipgloss.AdaptiveColor{Light: "#04B575", Dark: "#04B575"}).
-		Render
 )
 
 func (m model) View() string {
