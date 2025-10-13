@@ -11,6 +11,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/lucas-tremaroli/grind/internal/storage"
 )
 
 var (
@@ -136,12 +137,17 @@ func (m model) saveFile() error {
 		filename += ".md"
 	}
 
-	cwd, err := os.Getwd()
+	grindDir, err := storage.GetGrindConfigDir()
 	if err != nil {
 		return err
 	}
 
-	filePath := filepath.Join(cwd, filename)
+	notesDir := filepath.Join(grindDir, "notes")
+	if err := os.MkdirAll(notesDir, 0755); err != nil {
+		return err
+	}
+
+	filePath := filepath.Join(notesDir, filename)
 	return os.WriteFile(filePath, []byte(m.content.Value()), 0644)
 }
 

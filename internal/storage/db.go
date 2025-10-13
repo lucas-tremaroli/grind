@@ -45,14 +45,24 @@ func (db *DB) Close() error {
 	return db.conn.Close()
 }
 
-func getDBPath() (string, error) {
-	configDir, err := os.UserConfigDir()
+// GetGrindConfigDir returns the grind configuration directory path
+func GetGrindConfigDir() (string, error) {
+	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return "", err
 	}
 
-	grindDir := filepath.Join(configDir, "grind")
+	grindDir := filepath.Join(homeDir, ".config", "grind")
 	if err := os.MkdirAll(grindDir, 0755); err != nil {
+		return "", err
+	}
+
+	return grindDir, nil
+}
+
+func getDBPath() (string, error) {
+	grindDir, err := GetGrindConfigDir()
+	if err != nil {
 		return "", err
 	}
 
