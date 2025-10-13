@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/lucas-tremaroli/grind/cmd/note"
 	"github.com/lucas-tremaroli/grind/cmd/task"
 	"github.com/spf13/cobra"
 )
@@ -30,4 +31,5 @@ func Execute() error {
 
 func init() {
 	rootCmd.AddCommand(task.TaskCmd)
+	rootCmd.AddCommand(note.NoteCmd)
 }
