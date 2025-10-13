@@ -23,17 +23,15 @@ type keyMap struct {
 	Save key.Binding
 	Quit key.Binding
 	Tab  key.Binding
-	Help key.Binding
 }
 
 func (k keyMap) ShortHelp() []key.Binding {
-	return []key.Binding{k.Save, k.Help, k.Quit}
+	return []key.Binding{k.Save, k.Tab, k.Quit}
 }
 
 func (k keyMap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
-		{k.Tab},
-		{k.Save, k.Help, k.Quit},
+		{k.Save, k.Tab, k.Quit},
 	}
 }
 
@@ -43,16 +41,12 @@ var keys = keyMap{
 		key.WithHelp("ctrl+s", "save"),
 	),
 	Quit: key.NewBinding(
-		key.WithKeys("q", "ctrl+c"),
-		key.WithHelp("q/ctrl+c", "quit"),
+		key.WithKeys("ctrl+c"),
+		key.WithHelp("ctrl+c", "quit"),
 	),
 	Tab: key.NewBinding(
 		key.WithKeys("tab"),
 		key.WithHelp("tab", "switch field"),
-	),
-	Help: key.NewBinding(
-		key.WithKeys("?"),
-		key.WithHelp("?", "toggle help"),
 	),
 }
 
@@ -62,7 +56,6 @@ type model struct {
 	content      textarea.Model
 	focusedField int // 0 for filename, 1 for content
 	quitting     bool
-	saved        bool
 	err          error
 }
 
@@ -100,13 +93,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.quitting = true
 			return m, tea.Quit
 
+
 		case key.Matches(msg, keys.Save):
 			if m.filename.Value() != "" && m.content.Value() != "" {
 				err := m.saveFile()
 				if err != nil {
 					m.err = err
 				} else {
-					m.saved = true
 					return m, tea.Quit
 				}
 			}
@@ -154,26 +147,29 @@ func (m model) saveFile() error {
 
 func (m model) View() string {
 	if m.quitting {
-		if m.saved {
-			return statusMessageStyle("Note saved successfully!")
-		}
 		return ""
 	}
 
 	var s strings.Builder
-	s.WriteString("\n  Create a new markdown note\n\n")
-
-	if m.err != nil {
-		s.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color("#FF0000")).Render("Error: "+m.err.Error()) + "\n\n")
-	}
-
-	s.WriteString("Filename: " + m.filename.View())
-	if !strings.HasSuffix(m.filename.Value(), ".md") && m.filename.Value() != "" {
+	
+	// Filename input
+	s.WriteString(m.filename.View())
+	if m.filename.Value() != "" && !strings.HasSuffix(m.filename.Value(), ".md") {
 		s.WriteString(".md")
 	}
 	s.WriteString("\n\n")
-	s.WriteString("Content:\n" + m.content.View() + "\n\n")
-	s.WriteString(m.help.View(keys))
+	
+	// Content textarea  
+	s.WriteString(m.content.View())
+	s.WriteString("\n")
+	
+	// Error if any
+	if m.err != nil {
+		s.WriteString("Error: " + m.err.Error() + "\n")
+	}
+
+	// Help - always show short help
+	s.WriteString("\n" + m.help.ShortHelpView(keys.ShortHelp()))
 
 	return s.String()
 }
