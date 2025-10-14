@@ -32,6 +32,7 @@ func NewForm(title, description string, board *Board) *Form {
 
 	form.title.Placeholder = title
 	form.description.Placeholder = description
+	form.description.SetHeight(5)
 	form.title.SetValue(title)
 	form.description.SetValue(description)
 	form.title.Focus()
