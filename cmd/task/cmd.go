@@ -14,7 +14,7 @@ var TaskCmd = &cobra.Command{
 	Short: "Opens the task management tool",
 	Long:  `Opens the task management tool`,
 	Run: func(cmd *cobra.Command, args []string) {
-		p := tea.NewProgram(task.NewBoard())
+		p := tea.NewProgram(task.NewBoard(), tea.WithAltScreen())
 		if _, err := p.Run(); err != nil {
 			fmt.Printf("Error running program: %v", err)
 			os.Exit(1)
