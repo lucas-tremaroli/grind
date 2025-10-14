@@ -30,6 +30,24 @@ func (k keyMap) FullHelp() [][]key.Binding {
 	}
 }
 
+type formKeyMap struct {
+	Save key.Binding
+	Help key.Binding
+	Back key.Binding
+	Quit key.Binding
+}
+
+func (k formKeyMap) ShortHelp() []key.Binding {
+	return []key.Binding{k.Save, k.Back, k.Help, k.Quit}
+}
+
+func (k formKeyMap) FullHelp() [][]key.Binding {
+	return [][]key.Binding{
+		{k.Save, k.Back},
+		{k.Help, k.Quit},
+	}
+}
+
 var keys = keyMap{
 	New: key.NewBinding(
 		key.WithKeys("n"),
@@ -74,5 +92,25 @@ var keys = keyMap{
 	Back: key.NewBinding(
 		key.WithKeys("esc"),
 		key.WithHelp("esc", "back"),
+	),
+}
+
+// formKeys is used in forms - minimal keys for typing
+var formKeys = formKeyMap{
+	Save: key.NewBinding(
+		key.WithKeys("ctrl+s"),
+		key.WithHelp("ctrl+s", "save"),
+	),
+	Help: key.NewBinding(
+		key.WithKeys("tab"),
+		key.WithHelp("tab", "switch field"),
+	),
+	Back: key.NewBinding(
+		key.WithKeys("esc"),
+		key.WithHelp("esc", "back"),
+	),
+	Quit: key.NewBinding(
+		key.WithKeys("ctrl+c"),
+		key.WithHelp("ctrl+c", "quit"),
 	),
 }

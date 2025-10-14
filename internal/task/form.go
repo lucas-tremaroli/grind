@@ -54,24 +54,28 @@ func (f Form) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		f.col.list.Index()
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, keys.Quit):
+		case key.Matches(msg, formKeys.Quit):
 			return f, tea.Quit
-
-		case key.Matches(msg, keys.Back):
+		case key.Matches(msg, formKeys.Back):
 			if f.board != nil {
 				return f.board.Update(nil)
 			}
 			return f, nil
-		case key.Matches(msg, keys.Enter):
-			if f.title.Focused() {
-				f.title.Blur()
-				f.description.Focus()
-				return f, textarea.Blink
-			}
+		case key.Matches(msg, formKeys.Save):
 			if f.board != nil {
 				return f.board.Update(f)
 			}
 			return f, nil
+		case key.Matches(msg, formKeys.Help):
+			if f.title.Focused() {
+				f.title.Blur()
+				f.description.Focus()
+				return f, textarea.Blink
+			} else {
+				f.description.Blur()
+				f.title.Focus()
+				return f, textinput.Blink
+			}
 		}
 	}
 	if f.title.Focused() {
@@ -88,5 +92,5 @@ func (f Form) View() string {
 		"Create a new task",
 		f.title.View(),
 		f.description.View(),
-		f.help.View(keys))
+		f.help.View(formKeys))
 }
