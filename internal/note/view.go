@@ -16,7 +16,7 @@ func (m model) View() string {
 	if m.filename.Value() != "" && !strings.HasSuffix(m.filename.Value(), ".md") {
 		s.WriteString(".md")
 	}
-	s.WriteString("\n\n")
+	s.WriteString("\n")
 
 	// Content textarea
 	s.WriteString(m.content.View())

@@ -11,7 +11,7 @@ const (
 	FilenameWidth     = 50
 	FilenameCharLimit = 20
 	ContentWidth      = 80
-	ContentHeight     = 20
+	ContentHeight     = 5
 )
 
 // Config holds configuration for the note editor
